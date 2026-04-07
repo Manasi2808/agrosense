@@ -2,7 +2,7 @@ setuptools
 numpy
 pandas
 Flask
-scikit-learn
+scikit-learn==1.2.2
 requests
 Pillow
 gunicorn==23.0.0
