@@ -1,0 +1,148 @@
+{% extends 'layout.html' %}
+{% block body_class %}bg-crop{% endblock %}
+{% block body %}
+<style>
+  /* Override Bootstrap's strict .container to give these thick data cards maximum breadth */
+  @media (min-width: 992px) {
+    .container {
+      max-width: 1400px !important;
+    }
+  }
+</style>
+<div class="row justify-content-center min-vh-80 align-items-center py-5 px-2 px-md-4">
+
+  <!-- Left Column: Metrics -->
+  <div class="col-lg-6 mb-4 mb-lg-0">
+    <div class="glass-container animation-slideUp w-100 d-flex flex-column sync-card">
+      <div class="text-center mb-4">
+        <i class="fas fa-info-circle text-primary fa-4x mb-3"></i>
+        <h2 class="text-light mb-1" style="text-transform: capitalize;">{{ crop_name }} Insights</h2>
+        <div class="mb-3">
+          <span class="badge badge-success px-3 py-2" style="font-size: 0.95rem; font-weight: 500;">
+            <i class="fas fa-clock me-1"></i> Harvests in {{ total_time }}
+          </span>
+        </div>
+        <p class="text-muted small mb-0">{{ weather.desc }}</p>
+      </div>
+
+      <div class="custom-scrollbar"
+        style="overflow-y: auto; overflow-x: hidden; flex: 1; padding-right: 10px; margin-right: -5px;">
+        <div class="row g-3">
+          <!-- Agronomic Base Section -->
+          <div class="col-12 mb-3">
+            <div class="bg-dark p-3 rounded-lg border border-primary">
+              <h6 class="text-gradient fw-bold mb-3 text-center"><i class="fas fa-layer-group me-2"></i> Agronomic
+                Profile</h6>
+              <div class="row text-center">
+                <div class="col-6 mb-3">
+                  <span class="d-block text-muted x-small mb-1">Season</span>
+                  <span class="text-light small fw-bold">{{ weather.season }}</span>
+                </div>
+                <div class="col-6 mb-3">
+                  <span class="d-block text-muted x-small mb-1">Soil Type</span>
+                  <span class="text-light small fw-bold">{{ weather.soil_type }}</span>
+                </div>
+                <div class="col-6">
+                  <span class="d-block text-muted x-small mb-1">Ideal pH</span>
+                  <span class="text-light small fw-bold">{{ ph }}</span>
+                </div>
+                <div class="col-6">
+                  <span class="d-block text-muted x-small mb-1">Moisture</span>
+                  <span class="text-light small fw-bold">{{ moisture }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NPK Section -->
+          <div class="col-12 mb-3">
+            <div class="bg-dark p-3 rounded-lg border border-primary text-center">
+              <h6 class="text-gradient fw-bold mb-3"><i class="fas fa-flask me-2"></i> Fertilizer NPK Profile</h6>
+              <div class="d-flex justify-content-around">
+                <div class="metric-mini">
+                  <span class="d-block text-muted small">Nitrogen</span>
+                  <span class="text-primary fw-bold display-6">{{ n }}</span>
+                </div>
+                <div class="metric-mini">
+                  <span class="d-block text-muted small">Phosphorous</span>
+                  <span class="text-primary fw-bold display-6">{{ p }}</span>
+                </div>
+                <div class="metric-mini">
+                  <span class="d-block text-muted small">Potassium</span>
+                  <span class="text-primary fw-bold display-6">{{ k }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Environmental Section -->
+          <div class="col-12 mt-auto">
+            <div class="bg-dark p-3 rounded-lg border border-primary">
+              <h6 class="text-gradient fw-bold mb-3 text-center"><i class="fas fa-cloud-sun me-2"></i> Weather
+                Thresholds</h6>
+              <div class="row text-center">
+                <div class="col-4 border-end border-secondary">
+                  <i class="fas fa-thermometer-half text-warning mb-1"></i>
+                  <span class="d-block text-muted x-small">Temp</span>
+                  <span class="text-light small fw-bold">{{ weather.temperature }}</span>
+                </div>
+                <div class="col-4 border-end border-secondary">
+                  <i class="fas fa-tint text-info mb-1"></i>
+                  <span class="d-block text-muted x-small">Humidity</span>
+                  <span class="text-light small fw-bold">{{ weather.humidity }}</span>
+                </div>
+                <div class="col-4">
+                  <i class="fas fa-cloud-rain text-primary mb-1"></i>
+                  <span class="d-block text-muted x-small">Rainfall</span>
+                  <span class="text-light small fw-bold">{{ weather.rainfall }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-3 text-center border-top border-light">
+        <a href="{{ url_for('crop_insights') }}" class="btn btn-outline-light px-4 py-2" style="border-radius: 10px;">
+          <i class="fas fa-arrow-left me-2"></i> Explore Different Crop
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Crop Calendar Timeline -->
+  <div class="col-lg-6">
+    <div class="glass-container animation-slideUp w-100 d-flex flex-column sync-card" style="animation-delay: 0.15s;">
+      {% if calendar_data %}
+      <div class="text-start h-100 d-flex flex-column">
+        <h4 class="text-primary fw-bold mb-3"><i class="fas fa-calendar-alt me-2"></i> {{ crop_name|capitalize }} Growth
+          Calendar</h4>
+        <p class="text-muted mb-4">Detailed stage-wise management guide for <strong
+            style="text-transform: capitalize;">{{ crop_name }}</strong>.</p>
+
+        <div class="timeline flex-grow-1 scrollable-timeline custom-scrollbar">
+          {% for stage in calendar_data %}
+          <div class="timeline-item">
+            <div class="timeline-icon">
+              <i class="fas {{ stage.icon }}"></i>
+            </div>
+            <div class="timeline-content">
+              <h5>{{ stage.phase }}</h5>
+              <span class="timeline-duration"><i class="far fa-clock me-1"></i> {{ stage.duration }}</span>
+              <p class="timeline-action">{{ stage.action }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% else %}
+      <div class="d-flex flex-column justify-content-center h-100 align-items-center text-muted text-center py-5">
+        <i class="fas fa-leaf fa-3x mb-3 text-secondary" style="opacity: 0.5;"></i>
+        <p>Growth calendar is currently pending for this crop.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

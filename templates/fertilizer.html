@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+{% block body_class %}bg-fert{% endblock %}
+{% block body %}
+<div class="row justify-content-center min-vh-80 align-items-center py-5">
+  <div class="col-md-10 col-lg-8">
+    <div class="glass-container">
+      <div class="text-center mb-5">
+        <h2 class="text-gradient mb-3">Fertilizer Guide</h2>
+        <p class="text-muted">Discover the exact fertilizer your soil needs to maximize yield. Input your soil's current N-P-K levels and the crop you plan to grow.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('fert_recommend') }}">
+        <div class="row">
+          
+          <div class="col-md-8 mb-4">
+            <label for="crop" class="form-label-custom"><i class="fas fa-seedling text-primary me-2"></i> Target Crop</label>
+            <small class="form-text-desc">Select the crop you intend to cultivate</small>
+            <select name="cropname" class="form-control form-control-custom" id="crop" required>
+              <option value="" disabled selected>Select crop...</option>
+              <option value="rice">Rice</option>
+              <option value="maize">Maize</option>
+              <option value="chickpea">Chickpea</option>
+              <option value="kidneybeans">Kidney Beans</option>
+              <option value="pigeonpeas">Pigeon Peas</option>
+              <option value="mothbeans">Moth Beans</option>
+              <option value="mungbean">Mung Bean</option>
+              <option value="blackgram">Black Gram</option>
+              <option value="lentil">Lentil</option>
+              <option value="pomegranate">Pomegranate</option>
+              <option value="banana">Banana</option>
+              <option value="mango">Mango</option>
+              <option value="grapes">Grapes</option>
+              <option value="watermelon">Watermelon</option>
+              <option value="muskmelon">Muskmelon</option>
+              <option value="apple">Apple</option>
+              <option value="orange">Orange</option>
+              <option value="papaya">Papaya</option>
+              <option value="coconut">Coconut</option>
+              <option value="cotton">Cotton</option>
+              <option value="jute">Jute</option>
+              <option value="coffee">Coffee</option>
+            </select>
+          </div>
+          
+          <div class="col-md-4 mb-4">
+            <label for="farm_size" class="form-label-custom"><i class="fas fa-map-marked-alt text-primary me-2"></i> Farm Size</label>
+            <small class="form-text-desc">Total area in Acres</small>
+            <input type="number" step="0.1" class="form-control form-control-custom" id="farm_size" name="farm_size" placeholder="e.g. 5" value="1.0" required min="0.1" max="1000" />
+          </div>
+
+          <!-- Soil Parameters -->
+          <div class="col-md-4 mb-4">
+            <label for="Nitrogen" class="form-label-custom"><i class="fas fa-flask text-primary me-2"></i> Nitrogen (N)</label>
+            <small class="form-text-desc">Available Nitrogen in soil in kg/ha (0–140)</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Nitrogen" name="nitrogen" placeholder="e.g. 90" required min="0" max="140" />
+          </div>
+          
+          <div class="col-md-4 mb-4">
+            <label for="Phosphorous" class="form-label-custom"><i class="fas fa-flask text-primary me-2"></i> Phosphorous (P)</label>
+            <small class="form-text-desc">Available Phosphorous in soil in kg/ha (5–145)</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Phosphorous" name="phosphorous" placeholder="e.g. 42" required min="5" max="145" />
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <label for="Pottasium" class="form-label-custom"><i class="fas fa-flask text-primary me-2"></i> Potassium (K)</label>
+            <small class="form-text-desc">Available Potassium in soil in kg/ha (5–205)</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Pottasium" name="pottasium" placeholder="e.g. 43" required min="5" max="205" />
+          </div>
+          
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary-custom w-100">
+            <i class="fas fa-search me-2"></i> Get Fertilizer Advice
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

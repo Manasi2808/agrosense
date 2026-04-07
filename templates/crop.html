@@ -1,0 +1,163 @@
+{% extends 'layout.html' %}
+{% block body_class %}bg-crop{% endblock %}
+{% block body %}
+<div class="row justify-content-center min-vh-80 align-items-center py-5">
+  <div class="col-md-10 col-lg-8">
+    <div class="glass-container">
+      <div class="text-center mb-4">
+        <h2 class="text-gradient mb-2">Crop Recommendation</h2>
+        <p class="text-muted mb-0" style="font-size: 0.85rem;">Enter your soil and environmental data. Our intelligent
+          model will suggest the most profitable crop to grow.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('crop_prediction') }}">
+        <div class="row">
+          <!-- Environment Parameters -->
+          <div class="col-md-12 mb-2 d-flex justify-content-end">
+            <button type="button" class="btn btn-outline-success btn-sm rounded-pill font-weight-bold shadow-sm"
+              id="getWeatherBtn" style="transition: all 0.3s;">
+              <i class="fas fa-map-marker-alt me-1"></i> 📍 Get Field Weather
+            </button>
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <label for="Temperature" class="form-label-custom"><i class="fas fa-thermometer-half text-warning me-2"></i>
+              Temperature</label>
+            <small class="form-text-desc">Average temperature in Celsius</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Temperature" name="temperature"
+              placeholder="e.g. 20.8" required min="-10" max="60" />
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <label for="Humidity" class="form-label-custom"><i class="fas fa-tint text-info me-2"></i> Humidity</label>
+            <small class="form-text-desc">Relative humidity in percentage (%)</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Humidity" name="humidity"
+              placeholder="e.g. 82" required min="0" max="100" />
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <label for="Rainfall" class="form-label-custom"><i class="fas fa-cloud-rain text-primary me-2"></i>
+              Rainfall</label>
+            <small class="form-text-desc">Average rainfall in mm</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Rainfall" name="rainfall"
+              placeholder="e.g. 202.9" required min="0" max="500" />
+          </div>
+
+          <!-- Soil Parameters -->
+          <div class="col-md-6 mb-4">
+            <label for="Nitrogen" class="form-label-custom"><i class="fas fa-flask text-primary me-2"></i> Nitrogen
+              (N)</label>
+            <small class="form-text-desc">Available Nitrogen in soil in kg/ha (0–140)</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Nitrogen" name="nitrogen"
+              placeholder="e.g. 90" required min="0" max="140" />
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <label for="Phosphorous" class="form-label-custom"><i class="fas fa-flask text-primary me-2"></i>
+              Phosphorous (P)</label>
+            <small class="form-text-desc">Available Phosphorous in soil in kg/ha (5–145)</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Phosphorous" name="phosphorous"
+              placeholder="e.g. 42" required min="5" max="145" />
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <label for="Pottasium" class="form-label-custom"><i class="fas fa-flask text-primary me-2"></i> Potassium
+              (K)</label>
+            <small class="form-text-desc">Available Potassium in soil in kg/ha (5–205)</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="Pottasium" name="pottasium"
+              placeholder="e.g. 43" required min="5" max="205" />
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <label for="ph" class="form-label-custom"><i class="fas fa-vial text-primary me-2"></i> Soil pH
+              Level</label>
+            <small class="form-text-desc">Acidity or alkalinity of the soil (0-14)</small>
+            <input type="number" step="any" class="form-control form-control-custom" id="ph" name="ph"
+              placeholder="e.g. 6.5" required min="0" max="14" />
+          </div>
+          
+          <!-- Target Options -->
+          <div class="col-md-6 mb-4">
+            <label for="Category" class="form-label-custom"><i class="fas fa-list text-secondary me-2"></i> Crop Category</label>
+            <small class="form-text-desc">Filter by specific crop family</small>
+            <select class="form-control form-control-custom" id="Category" name="category">
+              <option value="All">All Categories</option>
+              <option value="Fruits">Fruits</option>
+              <option value="Grains">Grains</option>
+              <option value="Pulses">Pulses</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <label for="Duration" class="form-label-custom"><i class="fas fa-clock text-secondary me-2"></i> Harvest Duration</label>
+            <small class="form-text-desc">Enter the number of days available for crop growth (≤100: Short · 101–150: Medium · 150+: Long)</small>
+            <input type="number" class="form-control form-control-custom" id="Duration" name="duration"
+              placeholder="e.g. 90" min="1" max="730" required />
+          </div>
+
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary-custom w-100">
+            <i class="fas fa-magic me-2"></i> Predict Best Crop
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  document.getElementById('getWeatherBtn').addEventListener('click', function () {
+    const btn = this;
+    const alertHtml = '<i class="fas fa-spinner fa-spin me-1"></i> Fetching Data...';
+    btn.innerHTML = alertHtml;
+    btn.disabled = true;
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        fetch('/weather-by-coords', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ lat: lat, lon: lon })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.temperature && data.humidity) {
+              document.getElementById('Temperature').value = data.temperature;
+              document.getElementById('Humidity').value = data.humidity;
+              btn.innerHTML = '<i class="fas fa-check text-white me-1"></i> Success!';
+              btn.classList.remove('btn-outline-success');
+              btn.classList.add('btn-success', 'text-white');
+              setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> 📍 Field Weather Fetched';
+              }, 3000);
+            } else {
+              alert('Could not retrieve weather data.');
+              btn.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> 📍 Get Field Weather';
+              btn.disabled = false;
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            alert('Error reaching the server.');
+            btn.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> 📍 Get Field Weather';
+            btn.disabled = false;
+          });
+      }, function (error) {
+        alert("Please enable location permissions to automatically fetch your weather.");
+        btn.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> 📍 Get Field Weather';
+        btn.disabled = false;
+      });
+    } else {
+      alert("Geolocation is not supported by your browser.");
+      btn.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> 📍 Get Field Weather';
+      btn.disabled = false;
+    }
+  });
+</script>
+{% endblock %}

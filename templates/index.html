@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block body_class %}bg-home{% endblock %}
+{% block body %}
+<!-- Hero Section -->
+<div class="hero-container">
+    <h1 class="hero-title text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
+        Farm Smarter with <br>
+        <span class="text-gradient">AgroSense</span> Intelligence
+    </h1>
+    <!-- Subtitle removed as requested -->
+    <div class="mt-4">
+        <a href="#services" class="btn btn-primary-custom"
+            style="display:inline-block; width:auto; text-decoration:none;">
+            <i class="fas fa-arrow-down me-2"></i> Explore Services
+        </a>
+    </div>
+</div>
+
+<!-- Services Grid -->
+<div id="services" class="services-grid">
+    <!-- Crop Recommender -->
+    <a href="{{ url_for('crop_recommend') }}" class="service-card">
+        <div class="service-icon">
+            <i class="fas fa-seedling"></i>
+        </div>
+        <h3 class="service-title">Crop Recommender</h3>
+        <p class="service-desc">
+            Find out the most optimal crop to plant based on your specific soil conditions, temperature, humidity, and
+            rainfall levels.
+        </p>
+    </a>
+
+    <!-- Fertilizer Suggestion -->
+    <a href="{{ url_for('fertilizer_recommendation') }}" class="service-card">
+        <div class="service-icon">
+            <i class="fas fa-vial"></i>
+        </div>
+        <h3 class="service-title">Fertilizer Guide</h3>
+        <p class="service-desc">
+            Discover the exact fertilizer your soil needs to maximize yield. Just input your soil's Nitrogen,
+            Phosphorus, and Potassium.
+        </p>
+    </a>
+
+
+</div>
+{% endblock %}

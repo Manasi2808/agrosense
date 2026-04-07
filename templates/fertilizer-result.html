@@ -1,0 +1,94 @@
+{% extends 'layout.html' %}
+{% block body_class %}bg-fert{% endblock %}
+{% block body %}
+<style>
+  @media (min-width: 992px) {
+    .container {
+      max-width: 1300px !important;
+    }
+  }
+</style>
+<div class="row justify-content-center min-vh-80 align-items-stretch py-5 px-md-4">
+  
+  <!-- Left Column: Precision Dashboard -->
+  <div class="col-lg-6 mb-4 mb-lg-0">
+    <div class="glass-container animation-slideUp w-100 d-flex flex-column h-100 text-center">
+      <i class="fas fa-flask text-success fa-4x mb-3"></i>
+      <h3 class="text-light mb-1">Precision Prescription</h3>
+      <p class="text-muted small mb-4">Calculated output for cultivating <strong class="text-primary" style="text-transform: capitalize;">{{ crop_name }}</strong> on a {{ farm_size }} Acre field.</p>
+
+      <div class="row g-3 flex-grow-1 align-items-center">
+        <!-- Urea (Nitrogen) -->
+        <div class="col-12">
+            <div class="bg-dark p-3 rounded-lg border {% if urea > 0 %}border-primary{% else %}border-secondary{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-start">
+                        <span class="badge badge-primary px-2 py-1 mb-2">Nitrogen Base</span>
+                        <h5 class="fw-bold mb-0 text-light">Nitrogen Fertilizer</h5>
+                    </div>
+                    <div class="text-end">
+                        <h2 class="fw-bold text-gradient mb-0">{{ urea }} kg</h2>
+                        {% if urea == 0 %}<small class="text-muted">Optimum level reached</small>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SSP (Phosphorus) -->
+        <div class="col-12">
+            <div class="bg-dark p-3 rounded-lg border {% if ssp > 0 %}border-info{% else %}border-secondary{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-start">
+                        <span class="badge badge-info text-dark px-2 py-1 mb-2">Phosphorus Base</span>
+                        <h5 class="fw-bold mb-0 text-light">Phosphorus Fertilizer</h5>
+                    </div>
+                    <div class="text-end">
+                        <h2 class="fw-bold text-info mb-0">{{ ssp }} kg</h2>
+                        {% if ssp == 0 %}<small class="text-muted">Optimum level reached</small>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOP (Potassium) -->
+        <div class="col-12">
+            <div class="bg-dark p-3 rounded-lg border {% if mop > 0 %}border-warning{% else %}border-secondary{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-start">
+                        <span class="badge badge-warning text-dark px-2 py-1 mb-2">Potassium Base</span>
+                        <h5 class="fw-bold mb-0 text-light">Potassium Fertilizer</h5>
+                    </div>
+                    <div class="text-end">
+                        <h2 class="fw-bold text-warning mb-0">{{ mop }} kg</h2>
+                        {% if mop == 0 %}<small class="text-muted">Optimum level reached</small>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Legacy Qualitative Analysis -->
+  <div class="col-lg-6">
+    <div class="glass-container animation-slideUp w-100 d-flex flex-column h-100" style="animation-delay: 0.15s;">
+      
+      <div class="text-center">
+        <h3 class="text-gradient fw-bold mb-2"><i class="fas fa-leaf me-2"></i> Organic Alternatives</h3>
+        <p class="text-muted mb-4 pb-2 border-bottom border-light">Secondary soil health and compost interventions.</p>
+      </div>
+
+      <div class="bg-dark p-4 rounded-lg text-start flex-grow-1 custom-scrollbar" style="border: 1px solid var(--secondary); font-size: 1.05rem; line-height: 1.8; overflow-y: auto; max-height: 400px;">
+        {{ recommendation | safe }}
+      </div>
+
+      <div class="mt-4 pt-3 text-center border-top border-light">
+        <a href="{{ url_for('fertilizer_recommendation') }}" class="btn btn-outline-light px-4 py-2" style="border-radius: 10px; width: 100%;">
+          <i class="fas fa-redo-alt me-2"></i> Run Another Calculation
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

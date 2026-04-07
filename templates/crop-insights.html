@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+{% block body_class %}bg-crop{% endblock %}
+{% block body %}
+<div class="row justify-content-center min-vh-80 align-items-center py-5">
+  <div class="col-md-8">
+    <div class="glass-container animation-slideUp">
+      <div class="text-center mb-5">
+        <h2 class="text-gradient mb-3">Explore Crops</h2>
+        <p class="text-muted">Type any crop into our massive encyclopedia to instantly view its ideal growing
+          conditions, soil requirements, and full growth lifecycle.</p>
+      </div>
+
+      {% if error %}
+      <div class="alert alert-danger text-center mb-4" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i> {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('crop_insights_result') }}">
+        <div class="mb-4">
+          <label for="cropname" class="form-label-custom"><i class="fas fa-search text-primary me-2"></i> Search for a
+            Crop</label>
+          <input type="text" class="form-control form-control-custom" id="cropname" name="cropname"
+            placeholder="e.g., Rice, Cotton, Mango..." required>
+        </div>
+
+        <div class="mt-5">
+          <button type="submit" class="btn btn-primary-custom w-100">
+            <i class="fas fa-info-circle me-2"></i> View Insights
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

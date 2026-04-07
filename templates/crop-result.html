@@ -1,0 +1,151 @@
+{% extends 'layout.html' %}
+{% block body_class %}bg-crop{% endblock %}
+{% block body %}
+<div class="container py-5 px-md-4">
+  <div class="glass-container animation-slideUp w-100 p-4 p-md-5">
+    <div class="text-center mb-5">
+      <h2 class="text-light mb-3">Crop Recommendation Results</h2>
+      {% if fallback %}
+        <div class="alert alert-warning" role="alert" style="background-color: rgba(255, 193, 7, 0.2); border: 1px solid rgba(255,193,7,0.5); color: #856404; font-weight: 500; max-width: 800px; margin: 0 auto;">
+          <i class="fas fa-exclamation-triangle me-2"></i> No crops matched your exact Category and Duration filters under these specific soil conditions. Based on probability, here are the top overall alternative crops for your field.
+        </div>
+      {% else %}
+        <p class="text-muted" style="font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+          Based on your soil, environmental metrics, and target filters, here are your best crop options:
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Primary Recommendation -->
+    <div class="row align-items-stretch mb-5">
+      <!-- Top Crop Info -->
+      <div class="col-lg-4 mb-4 mb-lg-0">
+          <div class="h-100 bg-dark p-4 rounded-lg text-center d-flex flex-column justify-content-center" style="border: 1px solid var(--primary);">
+            <h5 class="text-muted text-uppercase mb-3" style="letter-spacing: 1px;">Primary Recommendation</h5>
+            <div class="mb-4">
+              <h1 class="text-gradient fw-bold display-5 m-0" style="text-transform: capitalize;">
+                {{ top_crops[0].name }}
+              </h1>
+            </div>
+            
+            
+            {% if top_crops[0].attributes %}
+            <div class="d-flex justify-content-center flex-wrap mt-auto">
+                {% for cat in top_crops[0].attributes.categories %}
+                  <span class="badge bg-primary text-light me-2 mb-2 px-3 py-2" style="font-size: 0.9rem;">{{ cat }}</span>
+                {% endfor %}
+                <span class="badge bg-secondary text-light mb-2 px-3 py-2" style="font-size: 0.9rem;"><i class="fas fa-clock me-1"></i> {{ top_crops[0].attributes.duration }}</span>
+            </div>
+            {% endif %}
+          </div>
+      </div>
+
+      <!-- Top Crop Calendar Timeline -->
+      <div class="col-lg-8">
+          <div class="h-100 bg-dark p-4 rounded-lg custom-scrollbar" style="max-height: 350px; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.1);">
+            {% if top_crops[0].calendar %}
+              <h5 class="text-primary fw-bold mb-4"><i class="fas fa-calendar-alt me-2"></i> Growth Calendar for {{ top_crops[0].name | capitalize }}</h5>
+              <div class="timeline p-2">
+                {% for stage in top_crops[0].calendar %}
+                  <div class="timeline-item mb-4">
+                    <div class="timeline-icon">
+                      <i class="fas {{ stage.icon }}"></i>
+                    </div>
+                    <div class="timeline-content pb-0">
+                      <h6 class="mb-1 text-light">{{ stage.phase }} <span class="text-muted ms-2" style="font-size: 0.85rem;"><i class="far fa-clock me-1"></i> {{ stage.duration }}</span></h6>
+                      <p class="timeline-action mb-0 text-muted" style="font-size: 0.95rem;">{{ stage.action }}</p>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="d-flex flex-column justify-content-center h-100 align-items-center text-muted text-center">
+                <i class="fas fa-leaf fa-3x mb-3 text-secondary" style="opacity: 0.5;"></i>
+                <p class="mb-0">Growth calendar is currently pending for this crop.</p>
+              </div>
+            {% endif %}
+          </div>
+      </div>
+    </div>
+
+    <!-- Alternative Suggestions -->
+    {% if top_crops|length > 1 %}
+    <div class="mt-4 pt-4" style="border-top: 1px solid rgba(255,255,255,0.1);">
+      <h5 class="text-light mb-4 text-center"><i class="fas fa-hand-pointer text-warning me-2"></i> Click an Alternative Suggestion to view details</h5>
+      <div class="row justify-content-center">
+        {% for crop in top_crops[1:] %}
+        <div class="col-md-5 mb-3">
+          <div class="bg-dark p-3 rounded-lg d-flex align-items-center justify-content-between" 
+               style="border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s;"
+               data-toggle="modal" data-target="#modal-{{ loop.index }}"
+               onmouseover="this.style.borderColor='var(--primary)';"
+               onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';">
+            <div>
+              <h4 class="text-light m-0" style="text-transform: capitalize;">{{ crop.name }}</h4>
+            </div>
+            {% if crop.attributes %}
+            <div class="text-end">
+              <span class="badge bg-secondary mb-1 d-block">{{ crop.attributes.duration }}</span>
+              <small class="text-muted">{{ crop.attributes.categories[0] }}</small>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-5">
+      <a href="{{ url_for('crop_recommend') }}" class="btn btn-outline-light px-4 py-2" style="border-radius: 10px;">
+        <i class="fas fa-arrow-left me-2"></i> Try Another Prediction
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Modals rendered outside of grid layout to fix z-index overlay issues -->
+{% if top_crops|length > 1 %}
+  {% for crop in top_crops[1:] %}
+  <div class="modal fade" id="modal-{{ loop.index }}" tabindex="-1" aria-hidden="true" data-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-dark text-light" style="border: 1px solid var(--primary); box-shadow: 0px 20px 50px rgba(0,0,0,0.8);">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h4 class="modal-title fw-bold text-gradient" style="text-transform: capitalize;">{{ crop.name }}</h4>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body text-start p-4">
+          {% if crop.calendar %}
+            <h5 class="text-primary fw-bold mb-4"><i class="fas fa-calendar-alt me-2"></i> Growth Calendar</h5>
+            <div class="timeline p-2 custom-scrollbar" style="max-height: 400px; overflow-y: auto;">
+              {% for stage in crop.calendar %}
+                <div class="timeline-item mb-4">
+                  <div class="timeline-icon">
+                    <i class="fas {{ stage.icon }}"></i>
+                  </div>
+                  <div class="timeline-content pb-0">
+                    <h6 class="mb-1 text-light">{{ stage.phase }} <span class="text-muted ms-2" style="font-size: 0.85rem;"><i class="far fa-clock me-1"></i> {{ stage.duration }}</span></h6>
+                    <p class="timeline-action mb-0 text-muted" style="font-size: 0.95rem;">{{ stage.action }}</p>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="d-flex flex-column justify-content-center align-items-center text-muted text-center py-5">
+              <i class="fas fa-leaf fa-3x mb-3 text-secondary" style="opacity: 0.5;"></i>
+              <p class="mb-0">Growth calendar is currently pending for this crop.</p>
+            </div>
+          {% endif %}
+        </div>
+        <div class="modal-footer border-top-0 pt-0 justify-content-center">
+          <button type="button" class="btn btn-outline-light px-4 py-2" data-dismiss="modal" style="border-radius: 10px; cursor: pointer;">
+            <i class="fas fa-arrow-left me-2"></i> Back to Results
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}
